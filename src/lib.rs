@@ -111,13 +111,16 @@ fn multiply_basis_function(
 
     let bytes_per_row = width * 4;
 
-    for y in 0..height {
-        for x in 0..width {
-            let basis = f32::cos(PI * component_x as f32 * x as f32 / width as f32)
-                * f32::cos(PI * component_y as f32 * y as f32 / height as f32);
-            r += basis * srgb_to_linear(u32::from(rgb[(4 * x + y * bytes_per_row) as usize]));
-            g += basis * srgb_to_linear(u32::from(rgb[(4 * x + 1 + y * bytes_per_row) as usize]));
-            b += basis * srgb_to_linear(u32::from(rgb[(4 * x + 2 + y * bytes_per_row) as usize]));
+    let step_by_y = std::cmp::max(height as usize / 1000, 1);
+    let step_by_x = std::cmp::max(width as usize / 1000, 1);
+    for y in (0..height).step_by(step_by_y) {
+        let basis_y = f32::cos(PI * component_y as f32 * y as f32 * (height as f32).recip());
+        for x in (0..width).step_by(step_by_x) {
+            let basis =
+                f32::cos(PI * component_x as f32 * x as f32 * (width as f32).recip()) * basis_y;
+            r += basis * srgb_to_linear(rgb[(4 * x + y * bytes_per_row) as usize]);
+            g += basis * srgb_to_linear(rgb[(4 * x + 1 + y * bytes_per_row) as usize]);
+            b += basis * srgb_to_linear(rgb[(4 * x + 2 + y * bytes_per_row) as usize]);
         }
     }
 
@@ -215,6 +218,6 @@ mod tests {
         let img = decode(&blurhash, width, height, 1.0).unwrap();
         save_buffer("out.png", &img, width, height, Rgba8).unwrap();
 
-        assert_eq!(img[0..5], [45, 1, 56, 255, 45]);
+        assert_eq!(img[0..5], [42, 0, 53, 255, 42]);
     }
 }

@@ -8,9 +8,13 @@ keywords = ["blurhash", "image"]
 license = "Apache-2.0/MIT"
 version = "0.1.1"
 authors = ["Raincal <cyj94228@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
+palette = { version = "0.6", default-features = false, features = ["std"] }
 
 [dev-dependencies]
 image = "0.23"
+
+[profile.bench]
+debug = true

@@ -8,9 +8,9 @@ pub fn encode(value: [f32; 3]) -> u32 {
 }
 
 pub fn decode(value: u32) -> [f32; 3] {
-    let int_r = value >> 16;
-    let int_g = (value >> 8) & 255;
-    let int_b = value & 255;
+    let int_r = (value >> 16) as u8;
+    let int_g = ((value >> 8) & 255) as u8;
+    let int_b = (value & 255) as u8;
 
     [
         srgb_to_linear(int_r),
